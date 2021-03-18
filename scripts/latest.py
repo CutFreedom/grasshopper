@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Simple script to fetch "latest.json" files for information about
+# the latest platform executables.
+#
 
 import time
 import json
@@ -33,8 +37,8 @@ def latest_info():
         print('PLATFORM:', p)
         print('  rollout start:', time.ctime(data['rolloutStart']))
         print('            end:', time.ctime(data['rolloutEnd']))
-        print('     base:', data['baseVersion'], 'via', data['baseInstallFile'])
-        print('  rollout:', data['rolloutVersion'], 'via', data['rolloutInstallFile'])
+        print(f'     base: {data["baseVersion"]} via "{DESIGN_ROOT}/{p}/{data["baseInstallFile"]}"')
+        print(f'  rollout: {data["rolloutVersion"]} via "{DESIGN_ROOT}/{p}/{data["rolloutInstallFile"]}"')
         # also: paused, rolloutUpdateFile, rolloutUpdateFileHash, enforcedFeatureConfig
 
 if __name__ == '__main__':
