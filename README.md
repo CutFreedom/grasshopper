@@ -1,7 +1,7 @@
 # grasshopper
 
 This repository does not, and *should not*, contain any third-party intellectual property.
-If you believe that your IP has been stolen, then please contact the organization owners,
+If you believe that your IP has been compromised, then please contact the organization owners,
 who will work with you to rectify your concerns.
 
 ## Problem Statement
