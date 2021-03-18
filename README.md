@@ -29,6 +29,9 @@ as they choose, then this link may be helpful to learn about your rights and
 potential concerns:
 https://www.eff.org/issues/coders/reverse-engineering-faq
 
+Note: Cricut is a registered trademark of [Cricut, Inc](https://cricut.com/).
+This project will only refer to their trademark in a nomative use.
+
 ## License
 All contents of this repository fall under the CC0 license, which basically means that
 no copyright is claimed (nor trademarks or patents), and "you" can use its contents
