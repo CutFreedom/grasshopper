@@ -1,0 +1,77 @@
+import discord
+import pandas as pd
+from datetime import datetime
+
+# don't judge
+emjoi = ['\U0001F1FC',
+         '\U0001F1F4',
+         '\U0001F1F7',
+         '\U0001F1F0',
+         '\U0001F1EE',
+         '\U0001F1F3',
+         '\U0001F1EC']
+
+
+# not current best practice but it works so there is that.
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print('Logged on as', self.user)
+
+    async def on_message(self, message):
+        data = pd.DataFrame(columns=['content', 'time', 'author', 'attachment'])
+        # output channel look up. used to send the file later
+        # You can find the channel id by right clicking on the desired channel in the application and selecting copy ID
+        # Note that it does not take a string and should be a straight INT being inputted.
+        upload_channel = client.get_channel(123456789)
+        # watching for command
+        if len(message.content) == 0:
+            return False
+        elif message.content.split()[0] == '_save':
+            # cant spell but it works so... and it looks cool
+            for emoji in emjoi:
+                await message.add_reaction(emoji)
+            channel = message.channel.name
+            m_id = message.id
+            author = message.author.name
+            t = datetime.now()
+            te = t.strftime("%b_%d_%y_%H%M")
+            filename = ('{}_{}.csv'.format(str(channel), str(te)))
+            # depending on the history length limit may need to be increased
+            async for message in message.channel.history(limit=100000):
+                # If the message doesnt contain an image it runs this
+                if not message.attachments:
+                    data = data.append({'content': message.content,
+                                        'time': message.created_at,
+                                        'author': message.author.name,
+                                        'attachment': ''}, ignore_index=True)
+                # Saves the url of an attached item.
+                if message.attachments:
+                    data = data.append({'content': message.content,
+                                        'time': message.created_at,
+                                        'author': message.author.name,
+                                        'attachment': message.attachments[0].url}, ignore_index=True)
+            # saves pandas file
+            data.to_csv(filename, index=False, header=True)
+            # opens and sends file to channel
+            with open(filename, 'r') as f:
+                file_to_send = discord.File(f)
+                await upload_channel.send("Backup of {} requested by {}".format(channel, author))
+                await upload_channel.send(file=file_to_send)
+            # deletes the request were ever it was
+            msg = await message.channel.fetch_message(m_id)
+            await msg.delete()
+
+
+'''
+https://discord.com/developers/applications in order to make a new bot. It will give you the token after creatation.
+It is under the bot tab.
+In order to add a bot to your server you have to have correct permissions on the sever.
+There is an OAuth2 tab above the bot tab. There you will select the permssions for the bot.
+You add the bot by coping the OAuth string and pasting it in a URL.
+'''
+token = ''
+
+if __name__ == '__main__':
+    client = MyClient()
+    client.run(token)
+ 
