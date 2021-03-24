@@ -4,12 +4,18 @@
 
 import sys
 import http
+import uuid
+import json
+import time
 
 import flask
 
 
 # Standard flask setup:
 app = flask.Flask(__name__)
+
+# Used for cookie domains
+CRICUT_COM = '.cricut.com'
 
 
 # DESIGN NOTES
@@ -19,6 +25,7 @@ app = flask.Flask(__name__)
 # a 400 response. This should be fine for an API rather than a website
 # presented directly to users.
 #
+
 
 #------------------------
 
@@ -150,6 +157,75 @@ def v4_expirations():
 @app.route('/v4/Lookups/GetAppSessionData')  # appName=Gliese
 def v4_get_session():
     app = flask.request.args['appName']
+    sid = uuid.uuid4()
+
+    ### no idea what each element represents, but this is the order
+    ### and the values that upstream delivers
+    body = (
+        'https://imgservice.cricut.com/design-public-mirror1/images/',
+        'https://imgservice.cricut.com/design-public-mirror1/templates/',
+        '-api.cricut.com/v4/Images/GetUserImage?ImageID=',
+        '',
+        '',
+        '100',
+        '151',
+        '',
+        '1-1-1',
+        'http://mirror.cricut.com/project/',
+        '1',
+        '51766',
+        KEPLER_J,
+        'https://imgservice.cricut.com/design-public-mirror1/software/',
+        'https://imgservice.cricut.com/design-public-mirror1/categories/',
+        'V4',
+        'https://s3-us-west-2.amazonaws.com/dev50-design-public/Fonts/',
+        str(int(time.time())),
+        )
+    ### maybe ensure the C-T includes the charset?
+    response = flask.make_response(flask.jsonify(body))
+    response.set_cookie('SessionID-Prod', str(sid),
+                        expires=None,  ### fix this
+                        path='/',
+                        domain=CRICUT_COM,
+                        )
+    ### fix these country values
+    ### US=312, BE=334
+    response.set_cookie('SelectedCountryID', '312',
+                        domain=CRICUT_COM, path='/')
+    response.set_cookie('Country-Code', 'US',
+                        domain=CRICUT_COM, path='/')
+    ### other response headers?
+    return response
+
+KEPLER = {
+    "Kepler": {
+        "Windows": {
+            "Available": {
+                "Version": "3.2.1.0",
+                "File": "CricutDesignSpace-3.2.1.0.exe",
+                "Type":"Optional",
+            },
+            "Required": {
+                "Version": "3.2.1.0",
+                "File": "CricutDesignSpace-3.2.1.0.exe",
+                "Type": "Required",
+            },
+        },
+        "MacOS": {
+            "Available": {
+                "Version": "3.2.1.0",
+                "File": "CricutDesignSpace-3.2.1.0.zip",
+                "Type": "Optional",
+            },
+            "Required": {
+                "Version": "3.2.1.0",
+                "File": "CricutDesignSpace-3.2.1.0.zip",
+                "Type": "Required",
+            },
+            },
+        },
+    }
+KEPLER_J = json.dumps(KEPLER)
 
 @app.route('/v4/ShoppingCart/Quote')
 def v4_shopping_quote():
